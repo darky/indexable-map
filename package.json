@@ -1,6 +1,6 @@
 {
   "name": "indexable-map",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Built-in JavaScript Map with secondary indexes",
   "keywords": [
     "map",
@@ -15,6 +15,10 @@
     "dist/index.js",
     "dist/index.d.ts"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:darky/indexable-map.git"
+  },
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "node ./test.ts",
