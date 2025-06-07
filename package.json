@@ -1,22 +1,30 @@
 {
   "name": "indexable-map",
   "version": "0.0.0",
-  "description": "Built-in JavaScript Map with secondary BTree indexes",
+  "description": "Built-in JavaScript Map with secondary indexes",
   "keywords": [
     "map",
     "index",
-    "btree",
-    "secondary",
-    "tree"
+    "secondary"
   ],
   "license": "MIT",
   "author": "Vladislav Botvin",
-  "type": "commonjs",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf dist && tsc",
+    "test": "node ./test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "mnemonist": "^0.40.3"
   },
   "devDependencies": {
+    "@types/node": "^22.15.30",
     "typescript": "^5.8.3"
   }
 }
