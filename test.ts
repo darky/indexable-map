@@ -9,7 +9,20 @@ test('should construct indexable map', () => {
       [2, { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' }],
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
@@ -93,7 +106,20 @@ test('should construct indexable map with multiple values for same secondary ind
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
       [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
@@ -191,6 +217,81 @@ test('should construct indexable map with multiple values for same secondary ind
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })
 
+test('should construct indexable map with filtered secondary index', () => {
+  const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }>(
+    [
+      [1, { age: 30, firstName: 'Galina', lastName: 'Ivanova' }],
+      [2, { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' }],
+      [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
+      [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
+    ],
+    [
+      {
+        field: 'age',
+        filter({ age }) {
+          return age > 30
+        },
+      },
+      {
+        field: 'lastName',
+        filter({ lastName }) {
+          return lastName.startsWith('L')
+        },
+      },
+    ]
+  )
+
+  assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
+    [
+      59,
+      {
+        key: 2,
+        value: {
+          age: 59,
+          firstName: 'Zinaida',
+          lastName: 'Petrovna',
+        },
+      },
+    ],
+    [
+      59,
+      {
+        key: 4,
+        value: {
+          age: 59,
+          firstName: 'Ibragim',
+          lastName: 'Lukov',
+        },
+      },
+    ],
+  ])
+  assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
+    [
+      'Lukov',
+      {
+        key: 3,
+        value: {
+          age: 17,
+          firstName: 'Stepan',
+          lastName: 'Lukov',
+        },
+      },
+    ],
+    [
+      'Lukov',
+      {
+        key: 4,
+        value: {
+          age: 59,
+          firstName: 'Ibragim',
+          lastName: 'Lukov',
+        },
+      },
+    ],
+  ])
+  assert.deepStrictEqual((im as any)._maps.firstName, void 0)
+})
+
 test('should properly set', () => {
   const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }>(
     [
@@ -199,7 +300,20 @@ test('should properly set', () => {
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
       [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   im.set(4, { age: 40, firstName: 'Elena', lastName: 'Korchagina' })
@@ -308,7 +422,20 @@ test('should properly del', () => {
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
       [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   im.delete(4)
@@ -395,7 +522,20 @@ test('should properly clear', () => {
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
       [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   im.clear()
@@ -414,7 +554,20 @@ test('should properly del', () => {
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
       [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   im.delete(4)
@@ -501,7 +654,20 @@ test('should properly get by index', () => {
       [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
       [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
     ],
-    ['age', 'lastName']
+    [
+      {
+        field: 'age',
+        filter() {
+          return true
+        },
+      },
+      {
+        field: 'lastName',
+        filter() {
+          return true
+        },
+      },
+    ]
   )
 
   assert.deepStrictEqual(im.getByIndex('age', 59), [

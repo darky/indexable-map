@@ -4,15 +4,24 @@ export class IndexableMap<K, V> extends Map<K, V> {
   private _maps = {} as {
     [key in keyof V]: MultiMap<V[keyof V], { key: K; value: V }>
   }
+  private _indexFilters = {} as {
+    [key in keyof V]: (val: V) => boolean
+  }
 
-  constructor(entries?: readonly (readonly [K, V])[] | null, indexes?: (keyof V)[]) {
+  constructor(
+    entries?: readonly (readonly [K, V])[] | null,
+    indexes?: { field: keyof V; filter: (val: V) => boolean }[]
+  ) {
     super(entries satisfies ConstructorParameters<MapConstructor>[0])
-    ;(indexes ?? []).forEach(key => {
-      this._maps[key] = new MultiMap()
+    ;(indexes ?? []).forEach(({ field, filter }) => {
+      this._maps[field] = new MultiMap()
+      this._indexFilters[field] = filter
     })
     entries?.forEach(([key, value]) =>
-      Object.keys(this._maps).forEach(mapKey =>
-        this._maps[mapKey as keyof V].set(value[mapKey as keyof V], { key, value })
+      Object.keys(this._maps).forEach(
+        mapKey =>
+          this._indexFilters[mapKey as keyof V]?.(value) &&
+          this._maps[mapKey as keyof V].set(value[mapKey as keyof V], { key, value })
       )
     )
   }
@@ -30,7 +39,9 @@ export class IndexableMap<K, V> extends Map<K, V> {
             this._maps[mapKey as keyof V].remove(oldVal[mapKey as keyof V], item)
           }
         })
-        this._maps[mapKey as keyof V].set(value[mapKey as keyof V], { key, value })
+        if (this._indexFilters[mapKey as keyof V]?.(value)) {
+          this._maps[mapKey as keyof V].set(value[mapKey as keyof V], { key, value })
+        }
       })
     }
     return super.set(key, value)
