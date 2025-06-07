@@ -15,7 +15,20 @@ const im = new IndexableMap<number, { age: number; firstName: string; lastName: 
     [3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' }],
     [4, { age: 59, firstName: 'Ibragim', lastName: 'Lukov' }],
   ],
-  ['age', 'lastName']
+  [
+    {
+      field: 'age',
+      filter() {
+        return true
+      },
+    },
+    {
+      field: 'lastName',
+      filter() {
+        return true
+      },
+    },
+  ]
 )
 
 assert.deepStrictEqual(im.getByIndex('age', 59), [
