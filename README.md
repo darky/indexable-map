@@ -1,5 +1,7 @@
 # indexable-map
 
+![NPM Version](https://img.shields.io/npm/v/indexable-map)
+
 Built-in JavaScript Map with secondary indexes
 
 ## Example
