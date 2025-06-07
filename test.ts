@@ -26,74 +26,14 @@ test('should construct indexable map', () => {
   )
 
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
-    [
-      30,
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      17,
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    [30, new Set([1])],
+    [59, new Set([2])],
+    [17, new Set([3])],
   ])
   assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
-    [
-      'Ivanova',
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      'Petrovna',
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([2])],
+    ['Lukov', new Set([3])],
   ])
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })
@@ -123,96 +63,14 @@ test('should construct indexable map with multiple values for same secondary ind
   )
 
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
-    [
-      30,
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 4,
-        value: {
-          age: 59,
-          firstName: 'Ibragim',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-    [
-      17,
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    [30, new Set([1])],
+    [59, new Set([2, 4])],
+    [17, new Set([3])],
   ])
   assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
-    [
-      'Ivanova',
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      'Petrovna',
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 4,
-        value: {
-          age: 59,
-          firstName: 'Ibragim',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([2])],
+    ['Lukov', new Set([3, 4])],
   ])
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })
@@ -241,54 +99,8 @@ test('should construct indexable map with filtered secondary index', () => {
     ]
   )
 
-  assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
-    [
-      59,
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 4,
-        value: {
-          age: 59,
-          firstName: 'Ibragim',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-  ])
-  assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
-    [
-      'Lukov',
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 4,
-        value: {
-          age: 59,
-          firstName: 'Ibragim',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-  ])
+  assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [[59, new Set([2, 4])]])
+  assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [['Lukov', new Set([3, 4])]])
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })
 
@@ -320,96 +132,16 @@ test('should properly set', () => {
 
   assert.deepStrictEqual(im.get(4), { age: 40, firstName: 'Elena', lastName: 'Korchagina' })
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
-    [
-      30,
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      17,
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-    [
-      40,
-      {
-        key: 4,
-        value: {
-          age: 40,
-          firstName: 'Elena',
-          lastName: 'Korchagina',
-        },
-      },
-    ],
+    [30, new Set([1])],
+    [59, new Set([2])],
+    [17, new Set([3])],
+    [40, new Set([4])],
   ])
   assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
-    [
-      'Ivanova',
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      'Petrovna',
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
-    [
-      'Korchagina',
-      {
-        key: 4,
-        value: {
-          age: 40,
-          firstName: 'Elena',
-          lastName: 'Korchagina',
-        },
-      },
-    ],
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([2])],
+    ['Lukov', new Set([3])],
+    ['Korchagina', new Set([4])],
   ])
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })
@@ -442,74 +174,14 @@ test('should properly del', () => {
 
   assert.deepStrictEqual(im.get(4), void 0)
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
-    [
-      30,
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      17,
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    [30, new Set([1])],
+    [59, new Set([2])],
+    [17, new Set([3])],
   ])
   assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
-    [
-      'Ivanova',
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      'Petrovna',
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([2])],
+    ['Lukov', new Set([3])],
   ])
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })
@@ -574,74 +246,14 @@ test('should properly del', () => {
 
   assert.deepStrictEqual(im.get(4), void 0)
   assert.deepStrictEqual(Array.from((im as any)._maps.age.entries()), [
-    [
-      30,
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      59,
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      17,
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    [30, new Set([1])],
+    [59, new Set([2])],
+    [17, new Set([3])],
   ])
   assert.deepStrictEqual(Array.from((im as any)._maps.lastName.entries()), [
-    [
-      'Ivanova',
-      {
-        key: 1,
-        value: {
-          age: 30,
-          firstName: 'Galina',
-          lastName: 'Ivanova',
-        },
-      },
-    ],
-    [
-      'Petrovna',
-      {
-        key: 2,
-        value: {
-          age: 59,
-          firstName: 'Zinaida',
-          lastName: 'Petrovna',
-        },
-      },
-    ],
-    [
-      'Lukov',
-      {
-        key: 3,
-        value: {
-          age: 17,
-          firstName: 'Stepan',
-          lastName: 'Lukov',
-        },
-      },
-    ],
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([2])],
+    ['Lukov', new Set([3])],
   ])
   assert.deepStrictEqual((im as any)._maps.firstName, void 0)
 })

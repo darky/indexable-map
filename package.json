@@ -24,9 +24,6 @@
     "test": "node ./test.ts",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {
-    "mnemonist": "^0.40.3"
-  },
   "devDependencies": {
     "@types/node": "^22.15.30",
     "typescript": "^5.8.3"
