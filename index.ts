@@ -1,3 +1,7 @@
+const objKeys = Object.keys.bind(Object) as <V>(obj: {
+  [key in keyof V]: unknown
+}) => (keyof V)[]
+
 export class IndexableMap<K, V> extends Map<K, V> {
   private _maps = {} as {
     [key in keyof V]: Map<V[keyof V], Set<K>>
@@ -16,12 +20,9 @@ export class IndexableMap<K, V> extends Map<K, V> {
       this._indexFilters[field] = filter
     })
     entries?.forEach(([key, value]) =>
-      Object.keys(this._maps).forEach(mapKey => {
-        if (this._indexFilters[mapKey as keyof V]?.(value)) {
-          this._maps[mapKey as keyof V].set(
-            value[mapKey as keyof V],
-            (this._maps[mapKey as keyof V].get(value[mapKey as keyof V]) ?? new Set()).add(key)
-          )
+      objKeys(this._maps).forEach(mapKey => {
+        if (this._indexFilters[mapKey]?.(value)) {
+          this._maps[mapKey].set(value[mapKey], (this._maps[mapKey].get(value[mapKey]) ?? new Set()).add(key))
         }
       })
     )
@@ -34,17 +35,14 @@ export class IndexableMap<K, V> extends Map<K, V> {
   override set(key: K, value: V) {
     const oldVal = this.get(key)
     if (oldVal != null) {
-      Object.keys(this._maps).forEach(mapKey => {
-        this._maps[mapKey as keyof V].get(oldVal[mapKey as keyof V])?.forEach(k => {
+      objKeys(this._maps).forEach(mapKey => {
+        this._maps[mapKey].get(oldVal[mapKey])?.forEach(k => {
           if (key === k) {
-            this._maps[mapKey as keyof V].get(oldVal[mapKey as keyof V])?.delete(k)
+            this._maps[mapKey].get(oldVal[mapKey])?.delete(k)
           }
         })
-        if (this._indexFilters[mapKey as keyof V]?.(value)) {
-          this._maps[mapKey as keyof V].set(
-            value[mapKey as keyof V],
-            (this._maps[mapKey as keyof V].get(value[mapKey as keyof V]) ?? new Set()).add(key)
-          )
+        if (this._indexFilters[mapKey]?.(value)) {
+          this._maps[mapKey].set(value[mapKey], (this._maps[mapKey].get(value[mapKey]) ?? new Set()).add(key))
         }
       })
     }
@@ -54,10 +52,10 @@ export class IndexableMap<K, V> extends Map<K, V> {
   override delete(key: K): boolean {
     const oldVal = this.get(key)
     if (oldVal != null) {
-      Object.keys(this._maps).forEach(mapKey => {
-        this._maps[mapKey as keyof V].get(oldVal[mapKey as keyof V])?.forEach(k => {
+      objKeys(this._maps).forEach(mapKey => {
+        this._maps[mapKey].get(oldVal[mapKey])?.forEach(k => {
           if (key === k) {
-            this._maps[mapKey as keyof V].get(oldVal[mapKey as keyof V])?.delete(k)
+            this._maps[mapKey].get(oldVal[mapKey])?.delete(k)
           }
         })
       })
@@ -66,8 +64,8 @@ export class IndexableMap<K, V> extends Map<K, V> {
   }
 
   override clear(): void {
-    Object.keys(this._maps).forEach(mapKey => {
-      this._maps[mapKey as keyof V].clear()
+    objKeys(this._maps).forEach(mapKey => {
+      this._maps[mapKey].clear()
     })
     return super.clear()
   }
