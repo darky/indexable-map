@@ -53,14 +53,17 @@ export class IndexableMap<K, V> extends Map<K, V> {
         }
       }
     }
+    return this
   }
 
   enableIndexes() {
     this._indexesEnabled = true
+    return this
   }
 
   disableIndexes() {
     this._indexesEnabled = false
+    return this
   }
 
   override set(key: K, value: V) {
