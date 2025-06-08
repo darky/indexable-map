@@ -78,11 +78,7 @@ export class IndexableMap<K, V, I extends string> extends Map<K, V> {
       const oldVal = this.get(key)
       for (const indexName of objKeys(this._indexes)) {
         if (oldVal != null) {
-          for (const k of this._indexes[indexName].get(oldVal[this._indexFields[indexName]]) ?? new Set()) {
-            if (key === k) {
-              this._indexes[indexName].get(oldVal[this._indexFields[indexName]])?.delete(k)
-            }
-          }
+          this._indexes[indexName].get(oldVal[this._indexFields[indexName]])?.delete(key)
         }
         if (this._indexFilters[indexName](value)) {
           this._indexes[indexName].set(
@@ -100,11 +96,7 @@ export class IndexableMap<K, V, I extends string> extends Map<K, V> {
       const oldVal = this.get(key)
       if (oldVal != null) {
         for (const indexName of objKeys(this._indexes)) {
-          for (const k of this._indexes[indexName].get(oldVal[this._indexFields[indexName]]) ?? new Set()) {
-            if (key === k) {
-              this._indexes[indexName].get(oldVal[this._indexFields[indexName]])?.delete(k)
-            }
-          }
+          this._indexes[indexName].get(oldVal[this._indexFields[indexName]])?.delete(key)
         }
       }
     }
