@@ -9,25 +9,28 @@ export class IndexableMap<K, V> extends Map<K, V> {
   private _indexFilters = {} as {
     [indexedField in keyof V]: (val: V) => boolean
   }
+  private _indexesEnabled = true
 
   constructor(
-    entries?: readonly (readonly [K, V])[] | null,
-    indexes?: { field: keyof V; filter: (val: V) => boolean }[]
+    entries: readonly (readonly [K, V])[] = [],
+    {
+      indexes = [],
+      indexesEnabled = true,
+    }: {
+      indexes?: { field: keyof V; filter: (val: V) => boolean }[]
+      indexesEnabled?: boolean
+    } = { indexes: [], indexesEnabled: true }
   ) {
     super(entries satisfies ConstructorParameters<MapConstructor>[0])
-    for (const { field, filter } of indexes ?? []) {
+    for (const { field, filter } of indexes) {
       this._indexes[field] = new Map()
       this._indexFilters[field] = filter
     }
-    for (const [key, value] of entries ?? []) {
-      for (const indexedField of objKeys(this._indexes)) {
-        if (this._indexFilters[indexedField]?.(value)) {
-          this._indexes[indexedField].set(
-            value[indexedField],
-            (this._indexes[indexedField].get(value[indexedField]) ?? new Set()).add(key)
-          )
-        }
-      }
+    if (indexesEnabled === false) {
+      this._indexesEnabled = false
+    }
+    if (this._indexesEnabled) {
+      this.refreshIndexes()
     }
   }
 
@@ -39,13 +42,36 @@ export class IndexableMap<K, V> extends Map<K, V> {
     return resp
   }
 
-  override set(key: K, value: V) {
-    const oldVal = this.get(key)
-    if (oldVal != null) {
+  refreshIndexes() {
+    for (const [key, value] of this.entries()) {
       for (const indexedField of objKeys(this._indexes)) {
-        for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
-          if (key === k) {
-            this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
+        if (this._indexFilters[indexedField]?.(value)) {
+          this._indexes[indexedField].set(
+            value[indexedField],
+            (this._indexes[indexedField].get(value[indexedField]) ?? new Set()).add(key)
+          )
+        }
+      }
+    }
+  }
+
+  enableIndexes() {
+    this._indexesEnabled = true
+  }
+
+  disableIndexes() {
+    this._indexesEnabled = false
+  }
+
+  override set(key: K, value: V) {
+    if (this._indexesEnabled) {
+      const oldVal = this.get(key)
+      for (const indexedField of objKeys(this._indexes)) {
+        if (oldVal != null) {
+          for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
+            if (key === k) {
+              this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
+            }
           }
         }
         if (this._indexFilters[indexedField]?.(value)) {
@@ -60,12 +86,14 @@ export class IndexableMap<K, V> extends Map<K, V> {
   }
 
   override delete(key: K): boolean {
-    const oldVal = this.get(key)
-    if (oldVal != null) {
-      for (const indexedField of objKeys(this._indexes)) {
-        for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
-          if (key === k) {
-            this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
+    if (this._indexesEnabled) {
+      const oldVal = this.get(key)
+      if (oldVal != null) {
+        for (const indexedField of objKeys(this._indexes)) {
+          for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
+            if (key === k) {
+              this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
+            }
           }
         }
       }
@@ -74,8 +102,10 @@ export class IndexableMap<K, V> extends Map<K, V> {
   }
 
   override clear(): void {
-    for (const indexedField of objKeys(this._indexes)) {
-      this._indexes[indexedField].clear()
+    if (this._indexesEnabled) {
+      for (const indexedField of objKeys(this._indexes)) {
+        this._indexes[indexedField].clear()
+      }
     }
     return super.clear()
   }
