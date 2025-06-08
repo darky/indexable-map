@@ -10,7 +10,7 @@ Built-in JavaScript Map with secondary indexes
 import assert from 'node:assert'
 import { IndexableMap } from 'indexable-map'
 
-const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }>(
+const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }, 'byYoungAge' | 'byOldAge'>(
   [
     [1, { age: 30, firstName: 'Galina', lastName: 'Ivanova' }],
     [2, { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' }],
@@ -21,21 +21,23 @@ const im = new IndexableMap<number, { age: number; firstName: string; lastName: 
     indexes: [
       {
         field: 'age',
-        filter() {
-          return true
+        filter({ age }) {
+          return age >= 40
         },
+        name: 'byOldAge',
       },
       {
-        field: 'lastName',
-        filter() {
-          return true
+        field: 'age',
+        filter({ age }) {
+          return age < 40
         },
+        name: 'byYoungAge',
       },
     ],
   }
 )
 
-assert.deepStrictEqual(im.getByIndex('age', 59), [
+assert.deepStrictEqual(im.getByIndex('byOldAge', 59), [
   {
     age: 59,
     firstName: 'Zinaida',
@@ -47,9 +49,8 @@ assert.deepStrictEqual(im.getByIndex('age', 59), [
     lastName: 'Lukov',
   },
 ])
-assert.deepStrictEqual(im.getByIndex('lastName', 'Petrovna'), [
-  { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' },
-])
-assert.deepStrictEqual(im.getByIndex('lastName', 'Zaiceva'), [])
-assert.deepStrictEqual(im.getByIndex('firstName', 'Alexey'), [])
+assert.deepStrictEqual(im.getByIndex('byYoungAge', 30), [{ age: 30, firstName: 'Galina', lastName: 'Ivanova' }])
+assert.deepStrictEqual(im.getByIndex('byYoungAge', 17), [{ age: 17, firstName: 'Stepan', lastName: 'Lukov' }])
+assert.deepStrictEqual(im.getByIndex('byYoungAge', 59), [])
+assert.deepStrictEqual(im.getByIndex('byOldAge', 17), [])
 ```
