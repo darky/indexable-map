@@ -85,7 +85,7 @@ export class IndexableMap<K, V> extends Map<K, V> {
     return super.set(key, value)
   }
 
-  override delete(key: K): boolean {
+  override delete(key: K) {
     if (this._indexesEnabled) {
       const oldVal = this.get(key)
       if (oldVal != null) {
@@ -101,7 +101,7 @@ export class IndexableMap<K, V> extends Map<K, V> {
     return super.delete(key)
   }
 
-  override clear(): void {
+  override clear() {
     if (this._indexesEnabled) {
       for (const indexedField of objKeys(this._indexes)) {
         this._indexes[indexedField].clear()
