@@ -10,7 +10,10 @@ Built-in JavaScript Map with secondary indexes
 import assert from 'node:assert'
 import { IndexableMap } from 'indexable-map'
 
-const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }, 'byYoungAge' | 'byOldAge'>(
+type Person = { age: number; firstName: string; lastName: string }
+type Indexes = 'byYoungAge' | 'byOldAge'
+
+const im = new IndexableMap<number, Person, Indexes>(
   [
     [1, { age: 30, firstName: 'Galina', lastName: 'Ivanova' }],
     [2, { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' }],
@@ -49,14 +52,10 @@ assert.deepStrictEqual(im.getByIndex('byOldAge', 59), [
     lastName: 'Lukov',
   },
 ])
-assert.deepStrictEqual(
-  im.getByIndex('byYoungAge', 30),
-  [{ age: 30, firstName: 'Galina', lastName: 'Ivanova' }]
-)
-assert.deepStrictEqual(
-  im.getByIndex('byYoungAge', 17),
-  [{ age: 17, firstName: 'Stepan', lastName: 'Lukov' }]
-)
+assert.deepStrictEqual(im.getByIndex('byYoungAge', 30),
+  [{ age: 30, firstName: 'Galina', lastName: 'Ivanova' }])
+assert.deepStrictEqual(im.getByIndex('byYoungAge', 17),
+  [{ age: 17, firstName: 'Stepan', lastName: 'Lukov' }])
 assert.deepStrictEqual(im.getByIndex('byYoungAge', 59), [])
 assert.deepStrictEqual(im.getByIndex('byOldAge', 17), [])
 ```
