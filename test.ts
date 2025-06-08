@@ -493,7 +493,10 @@ test('should properly get by index', () => {
 })
 
 test('multiple indexes for same field', () => {
-  const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }, 'byYoungAge' | 'byOldAge'>(
+  type Person = { age: number; firstName: string; lastName: string }
+  type Indexes = 'byYoungAge' | 'byOldAge'
+
+  const im = new IndexableMap<number, Person, Indexes>(
     [
       [1, { age: 30, firstName: 'Galina', lastName: 'Ivanova' }],
       [2, { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' }],
