@@ -4,10 +4,10 @@ const objKeys = Object.keys.bind(Object) as <V>(obj: {
 
 export class IndexableMap<K, V> extends Map<K, V> {
   private _indexes = {} as {
-    [key in keyof V]: Map<V[keyof V], Set<K>>
+    [indexedField in keyof V]: Map<V[keyof V], Set<K>>
   }
   private _indexFilters = {} as {
-    [key in keyof V]: (val: V) => boolean
+    [indexedField in keyof V]: (val: V) => boolean
   }
 
   constructor(
@@ -15,36 +15,46 @@ export class IndexableMap<K, V> extends Map<K, V> {
     indexes?: { field: keyof V; filter: (val: V) => boolean }[]
   ) {
     super(entries satisfies ConstructorParameters<MapConstructor>[0])
-    ;(indexes ?? []).forEach(({ field, filter }) => {
+    for (const { field, filter } of indexes ?? []) {
       this._indexes[field] = new Map()
       this._indexFilters[field] = filter
-    })
-    entries?.forEach(([key, value]) =>
-      objKeys(this._indexes).forEach(index => {
-        if (this._indexFilters[index]?.(value)) {
-          this._indexes[index].set(value[index], (this._indexes[index].get(value[index]) ?? new Set()).add(key))
+    }
+    for (const [key, value] of entries ?? []) {
+      for (const indexedField of objKeys(this._indexes)) {
+        if (this._indexFilters[indexedField]?.(value)) {
+          this._indexes[indexedField].set(
+            value[indexedField],
+            (this._indexes[indexedField].get(value[indexedField]) ?? new Set()).add(key)
+          )
         }
-      })
-    )
+      }
+    }
   }
 
-  getByIndex<K extends keyof V>(index: K, value: V[K]): V[] {
-    return Array.from(this._indexes[index]?.get(value)?.values() ?? []).flatMap(key => this.get(key) ?? [])
+  getByIndex<K extends keyof V>(indexedField: K, value: V[K]) {
+    const resp: V[] = []
+    for (const key of this._indexes[indexedField]?.get(value)?.values() ?? []) {
+      resp.push(this.get(key)!)
+    }
+    return resp
   }
 
   override set(key: K, value: V) {
     const oldVal = this.get(key)
     if (oldVal != null) {
-      objKeys(this._indexes).forEach(index => {
-        this._indexes[index].get(oldVal[index])?.forEach(k => {
+      for (const indexedField of objKeys(this._indexes)) {
+        for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
           if (key === k) {
-            this._indexes[index].get(oldVal[index])?.delete(k)
+            this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
           }
-        })
-        if (this._indexFilters[index]?.(value)) {
-          this._indexes[index].set(value[index], (this._indexes[index].get(value[index]) ?? new Set()).add(key))
         }
-      })
+        if (this._indexFilters[indexedField]?.(value)) {
+          this._indexes[indexedField].set(
+            value[indexedField],
+            (this._indexes[indexedField].get(value[indexedField]) ?? new Set()).add(key)
+          )
+        }
+      }
     }
     return super.set(key, value)
   }
@@ -52,21 +62,21 @@ export class IndexableMap<K, V> extends Map<K, V> {
   override delete(key: K): boolean {
     const oldVal = this.get(key)
     if (oldVal != null) {
-      objKeys(this._indexes).forEach(index => {
-        this._indexes[index].get(oldVal[index])?.forEach(k => {
+      for (const indexedField of objKeys(this._indexes)) {
+        for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
           if (key === k) {
-            this._indexes[index].get(oldVal[index])?.delete(k)
+            this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
           }
-        })
-      })
+        }
+      }
     }
     return super.delete(key)
   }
 
   override clear(): void {
-    objKeys(this._indexes).forEach(index => {
-      this._indexes[index].clear()
-    })
+    for (const indexedField of objKeys(this._indexes)) {
+      this._indexes[indexedField].clear()
+    }
     return super.clear()
   }
 }
