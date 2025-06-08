@@ -195,6 +195,19 @@ test('should refresh indexes', () => {
     ['Lukov', new Set([3])],
   ])
   assert.deepStrictEqual((im as any)._indexes.firstName, void 0)
+
+  im.delete(3)
+  im.refreshIndexes()
+
+  assert.deepStrictEqual(Array.from((im as any)._indexes.byAge.entries()), [
+    [30, new Set([1])],
+    [59, new Set([2])],
+  ])
+  assert.deepStrictEqual(Array.from((im as any)._indexes.byLastName.entries()), [
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([2])],
+  ])
+  assert.deepStrictEqual((im as any)._indexes.firstName, void 0)
 })
 
 test('should enable indexes', () => {

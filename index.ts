@@ -47,6 +47,9 @@ export class IndexableMap<K, V, I extends string> extends Map<K, V> {
   }
 
   refreshIndexes() {
+    for (const indexedField of objKeys(this._indexes)) {
+      this._indexes[indexedField].clear()
+    }
     for (const [key, value] of this.entries()) {
       for (const indexName of objKeys(this._indexes)) {
         if (this._indexFilters[indexName](value)) {
