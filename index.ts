@@ -36,7 +36,7 @@ export class IndexableMap<K, V> extends Map<K, V> {
 
   getByIndex<K extends keyof V>(indexedField: K, value: V[K]) {
     const resp: V[] = []
-    for (const key of this._indexes[indexedField]?.get(value)?.values() ?? []) {
+    for (const key of this._indexes[indexedField]?.get(value) ?? new Set()) {
       resp.push(this.get(key)!)
     }
     return resp
@@ -68,7 +68,7 @@ export class IndexableMap<K, V> extends Map<K, V> {
       const oldVal = this.get(key)
       for (const indexedField of objKeys(this._indexes)) {
         if (oldVal != null) {
-          for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
+          for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? new Set()) {
             if (key === k) {
               this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
             }
@@ -90,7 +90,7 @@ export class IndexableMap<K, V> extends Map<K, V> {
       const oldVal = this.get(key)
       if (oldVal != null) {
         for (const indexedField of objKeys(this._indexes)) {
-          for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? []) {
+          for (const k of this._indexes[indexedField].get(oldVal[indexedField]) ?? new Set()) {
             if (key === k) {
               this._indexes[indexedField].get(oldVal[indexedField])?.delete(k)
             }
