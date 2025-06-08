@@ -553,3 +553,49 @@ test('multiple indexes for same field', () => {
   assert.deepStrictEqual(im.getByIndex('byYoungAge', 59), [])
   assert.deepStrictEqual(im.getByIndex('byOldAge', 17), [])
 })
+
+test('vacuum', () => {
+  const im = new IndexableMap<number, { age: number; firstName: string; lastName: string }, 'byAge' | 'byLastName'>(
+    [],
+    {
+      indexes: [
+        {
+          field: 'age',
+          filter() {
+            return true
+          },
+          name: 'byAge',
+        },
+        {
+          field: 'lastName',
+          filter() {
+            return true
+          },
+          name: 'byLastName',
+        },
+      ],
+    }
+  )
+
+  im.set(1, { age: 30, firstName: 'Galina', lastName: 'Ivanova' })
+  im.set(2, { age: 59, firstName: 'Zinaida', lastName: 'Petrovna' })
+  im.set(3, { age: 17, firstName: 'Stepan', lastName: 'Lukov' })
+  im.delete(3)
+  im.delete(2)
+
+  assert.deepStrictEqual(Array.from((im as any)._indexes.byAge.entries()), [
+    [30, new Set([1])],
+    [59, new Set([])],
+    [17, new Set([])],
+  ])
+  assert.deepStrictEqual(Array.from((im as any)._indexes.byLastName.entries()), [
+    ['Ivanova', new Set([1])],
+    ['Petrovna', new Set([])],
+    ['Lukov', new Set([])],
+  ])
+
+  im.vacuum()
+
+  assert.deepStrictEqual(Array.from((im as any)._indexes.byAge.entries()), [[30, new Set([1])]])
+  assert.deepStrictEqual(Array.from((im as any)._indexes.byLastName.entries()), [['Ivanova', new Set([1])]])
+})

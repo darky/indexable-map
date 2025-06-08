@@ -73,6 +73,16 @@ export class IndexableMap<K, V, I extends string> extends Map<K, V> {
     return this
   }
 
+  vacuum() {
+    for (const indexedField of objKeys(this._indexes)) {
+      for (const [fieldValue, set] of this._indexes[indexedField].entries()) {
+        if (!set.size) {
+          this._indexes[indexedField].delete(fieldValue)
+        }
+      }
+    }
+  }
+
   override set(key: K, value: V) {
     if (this._indexesEnabled) {
       const oldVal = this.get(key)
